@@ -1,0 +1,18 @@
+[Unit]
+Description=Embedding API Service
+Documentation=https://github.com/zhonghuaY/embed_memory_api
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/albert/Downloads/embed_memory_api
+EnvironmentFile=/home/albert/Downloads/embed_memory_api/config.env
+ExecStart=/home/albert/Downloads/embed_memory_api/.venv/bin/python3 main.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=embed-api
+
+[Install]
+WantedBy=default.target

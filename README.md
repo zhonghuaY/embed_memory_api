@@ -104,14 +104,52 @@ curl -X POST http://localhost:8786/v1/embeddings \
   -d '{"input": ["apple", "banana", "cherry"]}'
 ```
 
+## Systemd 服务管理
+
+### 一键安装（用户级服务，无需 sudo）
+
+```bash
+./install.sh
+```
+
+安装后服务会自动启动并设置为开机自启。
+
+### 常用命令
+
+```bash
+# 查看状态
+systemctl --user status embed-api
+
+# 查看日志
+journalctl --user -u embed-api -f
+
+# 重启
+systemctl --user restart embed-api
+
+# 停止
+systemctl --user stop embed-api
+
+# 卸载
+./uninstall.sh
+```
+
+### 注意事项
+
+- 使用 `loginctl enable-linger` 确保用户服务在未登录时也能运行（install.sh 会自动执行）
+- 服务配置文件位于 `~/.config/systemd/user/embed-api.service`
+- 修改 `config.env` 后需 `systemctl --user restart embed-api` 生效
+
 ## 项目结构
 
 ```
 embed_memory_api/
-├── main.py           # FastAPI 服务主文件
-├── test_api.py       # 测试用例 (33 cases)
-├── requirements.txt  # Python 依赖
-├── config.env        # 配置文件
-├── run.sh            # 启动脚本
+├── main.py              # FastAPI 服务主文件
+├── test_api.py          # 测试用例 (33 cases)
+├── requirements.txt     # Python 依赖
+├── config.env           # 配置文件
+├── embed-api.service    # systemd 服务单元
+├── install.sh           # 安装脚本
+├── uninstall.sh         # 卸载脚本
+├── run.sh               # 手动启动脚本
 └── README.md
 ```
