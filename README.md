@@ -4,16 +4,22 @@
 
 ## 快速开始
 
+### Linux / macOS
+
 ```bash
-# 创建虚拟环境并安装依赖
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-
-# 启动服务
 ./run.sh
-# 或直接运行
-python3 main.py
+```
+
+### Windows
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+run.bat
 ```
 
 服务默认运行在 `http://0.0.0.0:8786`。
@@ -104,52 +110,58 @@ curl -X POST http://localhost:8786/v1/embeddings \
   -d '{"input": ["apple", "banana", "cherry"]}'
 ```
 
-## Systemd 服务管理
+## 服务管理
 
-### 一键安装（用户级服务，无需 sudo）
+### Linux（systemd 用户级服务，无需 sudo）
 
 ```bash
+# 安装并开机自启
 ./install.sh
-```
 
-安装后服务会自动启动并设置为开机自启。
-
-### 常用命令
-
-```bash
-# 查看状态
+# 常用命令
 systemctl --user status embed-api
-
-# 查看日志
-journalctl --user -u embed-api -f
-
-# 重启
 systemctl --user restart embed-api
-
-# 停止
 systemctl --user stop embed-api
+journalctl --user -u embed-api -f
 
 # 卸载
 ./uninstall.sh
 ```
 
-### 注意事项
+- `loginctl enable-linger` 确保用户服务在未登录时也能运行（install.sh 自动执行）
+- 修改 `config.env` 后需 `systemctl --user restart embed-api`
 
-- 使用 `loginctl enable-linger` 确保用户服务在未登录时也能运行（install.sh 会自动执行）
-- 服务配置文件位于 `~/.config/systemd/user/embed-api.service`
-- 修改 `config.env` 后需 `systemctl --user restart embed-api` 生效
+### Windows（计划任务，开机自启）
+
+以管理员身份运行 PowerShell：
+
+```powershell
+# 安装并开机自启
+.\install_windows.ps1
+
+# 管理
+Get-ScheduledTask -TaskName EmbedAPI          # 状态
+Start-ScheduledTask -TaskName EmbedAPI        # 启动
+Stop-ScheduledTask -TaskName EmbedAPI         # 停止
+
+# 卸载
+.\uninstall_windows.ps1
+```
 
 ## 项目结构
 
 ```
 embed_memory_api/
-├── main.py              # FastAPI 服务主文件
-├── test_api.py          # 测试用例 (33 cases)
-├── requirements.txt     # Python 依赖
-├── config.env           # 配置文件
-├── embed-api.service    # systemd 服务单元
-├── install.sh           # 安装脚本
-├── uninstall.sh         # 卸载脚本
-├── run.sh               # 手动启动脚本
+├── main.py                  # FastAPI 服务主文件
+├── test_api.py              # 测试用例 (33 cases)
+├── requirements.txt         # Python 依赖
+├── config.env               # 配置文件
+├── run.sh                   # Linux 启动脚本
+├── run.bat                  # Windows 启动脚本
+├── embed-api.service        # Linux systemd 服务单元
+├── install.sh               # Linux 安装脚本
+├── uninstall.sh             # Linux 卸载脚本
+├── install_windows.ps1      # Windows 安装脚本
+├── uninstall_windows.ps1    # Windows 卸载脚本
 └── README.md
 ```
